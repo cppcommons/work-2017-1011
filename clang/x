@@ -1,0 +1,26 @@
+#!/bin/bash -uxv
+function sjis () {
+    $*  |& iconv -f cp932 -t utf-8
+}
+clang -std=c++11 -g -S -emit-llvm test.cpp
+#clang -std=c++11 -O0 -g -o a.exe test.cpp -lstdc++
+sjis clang -std=c++11 -c -O0 -g -o test.o test.cpp
+#gcc -o a.exe test.o -lstdc++
+gcc -o a.exe test.o -static -lstdc++
+./a.exe 11 22 33
+echo $?
+lli -force-interpreter test.ll 11 22 33
+echo $?
+llvm-as test.ll
+lli -force-interpreter test.bc 11 22 33
+echo $?
+llc -O3 -march=x86 -mtriple=i686-pc-windows-cygnus test.bc -o test32.s
+llc -O3 -filetype=obj -march=x86 test.ll
+gcc -o b.exe test.obj -lstdc++
+./b.exe 11 22 33
+echo $?
+#g++ -o gen `llvm-config --libs core --cxxflags --ldflags` gen.cpp
+#g++ -o gen `llvm-config --cxxflags --ldflags` gen.cpp -lLLVM-4.0.1
+#g++ -o gen `llvm-config --cxxflags --ldflags` gen.cpp `llvm-config --libs`
+#./gen
+#lli -force-interpreter -load=kernel32.dll -load=user32.dll helloworld.bc 11 22 33
