@@ -9,6 +9,6 @@ void main(string[] args)
 	
 	// Lets the user press <Return> before program returns
 	stdin.readln();
-	stdout.writeln("AAA");
+	stdout.writeln("AAABBB");
 }
 
